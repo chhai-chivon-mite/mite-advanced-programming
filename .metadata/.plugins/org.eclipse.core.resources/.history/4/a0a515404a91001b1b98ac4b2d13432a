@@ -1,0 +1,43 @@
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.PrintWriter;
+import java.util.Scanner;
+
+public class Main {
+	
+	public static void main(String[] args) {
+		// Show options to user
+		System.out.println("Welcome to MITE App:");
+		System.out.println("Enter 'w' to write a file, and 'r' to read a file.");
+		System.out.print("Enter here: ");
+	
+	}
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

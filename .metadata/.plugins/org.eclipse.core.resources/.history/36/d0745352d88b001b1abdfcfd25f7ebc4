@@ -1,0 +1,22 @@
+import java.io.IOException;
+import java.io.InputStream;
+
+public class Main {
+	
+	public static void main(String[] args) {
+		
+		// Connect input stream to keyboard 
+		InputStream inputStream = System.in;
+		try {
+			// Read data from keyboard using input stream
+			int data = inputStream.read();
+			// Show data to the console
+			System.out.println("Data is : " + data);
+			
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+	}
+	
+}

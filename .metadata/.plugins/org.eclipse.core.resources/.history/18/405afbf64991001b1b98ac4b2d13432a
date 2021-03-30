@@ -1,0 +1,84 @@
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.PrintWriter;
+import java.util.Scanner;
+
+public class Main {
+	
+	public static void main(String[] args) {
+		/*
+		// Connect input stream to keyboard 
+		InputStream inputStream = System.in;
+		//try {
+			// Read data from keyboard using input stream
+			//int data = inputStream.read();
+			
+			// Read data from keyboard using scanner
+			Scanner scanner = new Scanner(inputStream);
+			String data = scanner.nextLine();
+			
+			// Show data to the console
+			System.out.println("Data is : " + data);
+			
+		//} catch (IOException e) {
+		//	e.printStackTrace();
+		//}
+		 */
+		
+		
+		// Read data from File
+		/*try {
+			InputStream inputStream = new FileInputStream("./asset/myfile.txt");
+			Scanner scanner = new Scanner(inputStream);
+			while(scanner.hasNextLine()) {
+				String line = scanner.nextLine();
+				System.out.println("Data: " + line);
+			}
+			scanner.close();
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		}*/
+		
+		// Write data to File
+		try {
+			OutputStream outputStream = new FileOutputStream("./asset/myfile.txt");
+			PrintWriter writer = new PrintWriter(outputStream);
+			writer.write("Good evening.\n");
+			writer.write("Welcome to Advanced Programming.");
+			writer.flush();
+			writer.close();
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		}
+		
+	}
+	
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
