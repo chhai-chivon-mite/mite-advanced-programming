@@ -1,3 +1,4 @@
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -13,7 +14,7 @@ public class HttpClient {
 		try {
 			// 1. Connect to HTTP Server
 			System.out.println("Establish connection to the server...");
-			Socket connection = new Socket("192.168.100.3", 80);
+			Socket connection = new Socket("rupp.edu.kh", 80);
 			System.out.println("Connected successfully.");
 			
 			// 2. Load IO streams
@@ -21,16 +22,33 @@ public class HttpClient {
 			InputStream inputStream = connection.getInputStream();
 			
 			// 3.1. Send request to the server
+			HttpRequest request = new HttpRequest("GET", "/fe/", "");
+			request.addHeader("Host", "rupp.edu.kh");
+			request.addHeader("User-Agent", "My User Agent");
+			request.addHeader("Connection", "closed");
+			System.out.println("Request: ");
+			System.out.println(request.toRawRequest());
+			
 			PrintWriter printWriter = new PrintWriter(outputStream);
-			printWriter.write("Hello apache!\r\n");
-			printWriter.write("How are you?\r\n");
+			printWriter.write(request.toRawRequest());
 			printWriter.flush();
 			
 			// 3.2. Read response from the server
 			Scanner scanner = new Scanner(inputStream);
-			String response = scanner.nextLine();
-			System.out.println("Response: " + response);
+			String rawResponse = "";
+			while(scanner.hasNextLine()) {
+				String line = scanner.nextLine();
+				rawResponse += line + "\r\n";
+			}
 			scanner.close();
+			
+			// Process response
+			System.out.println("Response: ");
+			System.out.println(rawResponse);
+			HttpResponse response = new HttpResponse(rawResponse);
+			System.out.println("Version: " + response.version);
+			System.out.println("Code: " + response.statusCode);
+			System.out.println("Reason: " + response.reasonPhrase);
 			
 			// 4. Close connection
 			connection.close();
@@ -43,4 +61,25 @@ public class HttpClient {
 		
 	}
 	
+	
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
