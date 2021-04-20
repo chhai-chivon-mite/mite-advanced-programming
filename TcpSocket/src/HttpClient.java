@@ -1,4 +1,3 @@
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -22,14 +21,12 @@ public class HttpClient {
 			InputStream inputStream = connection.getInputStream();
 			
 			// 3.1. Send request to the server
+			PrintWriter printWriter = new PrintWriter(outputStream);
+			
 			HttpRequest request = new HttpRequest("GET", "/fe/", "");
 			request.addHeader("Host", "rupp.edu.kh");
-			request.addHeader("User-Agent", "My User Agent");
-			request.addHeader("Connection", "closed");
-			System.out.println("Request: ");
-			System.out.println(request.toRawRequest());
+			request.addHeader("Connection", "Close");
 			
-			PrintWriter printWriter = new PrintWriter(outputStream);
 			printWriter.write(request.toRawRequest());
 			printWriter.flush();
 			
@@ -37,18 +34,17 @@ public class HttpClient {
 			Scanner scanner = new Scanner(inputStream);
 			String rawResponse = "";
 			while(scanner.hasNextLine()) {
-				String line = scanner.nextLine();
-				rawResponse += line + "\r\n";
+				rawResponse += scanner.nextLine() + "\r\n";
 			}
-			scanner.close();
-			
-			// Process response
-			System.out.println("Response: ");
-			System.out.println(rawResponse);
 			HttpResponse response = new HttpResponse(rawResponse);
-			System.out.println("Version: " + response.version);
-			System.out.println("Code: " + response.statusCode);
-			System.out.println("Reason: " + response.reasonPhrase);
+			System.out.println("Version: " + response.getHttpVersion());
+			System.out.println("Status code: " + response.getStatusCode());
+			System.out.println("Reason phrase: " + response.getReasonPhrase());
+			System.out.println("Headers: " + response.getHeaders());
+			System.out.println("Body: " + response.getBody());
+			System.out.println(rawResponse);
+			
+			scanner.close();
 			
 			// 4. Close connection
 			connection.close();
@@ -63,17 +59,6 @@ public class HttpClient {
 	
 	
 }
-
-
-
-
-
-
-
-
-
-
-
 
 
 
