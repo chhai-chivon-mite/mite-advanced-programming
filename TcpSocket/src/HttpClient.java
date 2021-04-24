@@ -13,7 +13,7 @@ public class HttpClient {
 		try {
 			// 1. Connect to HTTP Server
 			System.out.println("Establish connection to the server...");
-			Socket connection = new Socket("rupp.edu.kh", 80);
+			Socket connection = new Socket("localhost", 9999);
 			System.out.println("Connected successfully.");
 			
 			// 2. Load IO streams
@@ -27,7 +27,7 @@ public class HttpClient {
 			request.addHeader("Host", "rupp.edu.kh");
 			request.addHeader("Connection", "Close");
 			
-			printWriter.write(request.toRawRequest());
+			printWriter.write("CCP/1.0#list#\r\n");
 			printWriter.flush();
 			
 			// 3.2. Read response from the server
@@ -36,13 +36,14 @@ public class HttpClient {
 			while(scanner.hasNextLine()) {
 				rawResponse += scanner.nextLine() + "\r\n";
 			}
+			System.out.println(rawResponse);
 			HttpResponse response = new HttpResponse(rawResponse);
 			System.out.println("Version: " + response.getHttpVersion());
 			System.out.println("Status code: " + response.getStatusCode());
 			System.out.println("Reason phrase: " + response.getReasonPhrase());
 			System.out.println("Headers: " + response.getHeaders());
 			System.out.println("Body: " + response.getBody());
-			System.out.println(rawResponse);
+			
 			
 			scanner.close();
 			
