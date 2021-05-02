@@ -25,10 +25,15 @@ public class Server {
 				// 3. Read data from client
 				InputStream inputStream = connection.getInputStream();
 				Scanner scanner = new Scanner(inputStream);
-				String data = scanner.nextLine();
-				
-				// 4. Process data
-				processRequest(connection, data);
+				while(true){
+					String request = scanner.nextLine();
+					
+					// 4. Process data
+					if(!processRequest(connection, request)) {
+						break;
+					}
+				}
+				scanner.close();
 			}
 			
 		} catch (IOException e) {
@@ -39,11 +44,11 @@ public class Server {
 		
 	}
 	
-	private static void processRequest(Socket connection, String request) throws IOException {
+	private static boolean processRequest(Socket connection, String request) throws IOException {
 		String[] parts = request.split("#");
 		if(parts.length < 2 || parts.length > 3 ) {
 			sendResponse(connection, "CCP/1.0#invalid#<Invalid request.>");
-			return;
+			return true;
 		}
 		
 		String operation = parts[1];
@@ -54,7 +59,7 @@ public class Server {
 			String[] parameterParts = parameters.split("><");
 			if(parameterParts.length != 3) {
 				sendResponse(connection, "CCP/1.0#invalid#<Invalid request.>");
-				return;
+				return true;
 			}
 			String sourceCurrency = parameterParts[0].replace("<", "");
 			double amount = Double.parseDouble(parameterParts[1]);
@@ -63,7 +68,11 @@ public class Server {
 			sendResponse(connection, "CCP/1.0#ok#<" + result + ">");
 		} else if(operation.equals("exit")) {
 			connection.close();
+			return false;
 		}
+		
+		
+		return true;
 	}
 	
 	private static void sendResponse(Socket connection, String response) throws IOException {
