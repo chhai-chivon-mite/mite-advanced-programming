@@ -11,7 +11,7 @@ public class Client {
 		
 		try {
 			// 1. Connect to server
-			Socket connection = new Socket("13.229.49.95", 9999);
+			Socket connection = new Socket("localhost", 9999);
 			PrintWriter printWriter = new PrintWriter(connection.getOutputStream());
 			Scanner scanner = new Scanner(connection.getInputStream());
 			
