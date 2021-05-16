@@ -22,11 +22,10 @@ public class Server {
 				System.out.println("Waiting for client...");
 				Socket connection = serverSocket.accept();
 				
-				// Create a new thread to handle the client
-				System.out.println("Create a new thread to handle the client");
+				// 3. Create another thread to handle the connection
+				System.out.println("Create another thread to handle the connection.");
 				Thread thread = new ClientHandlerThread(connection);
 				thread.start();
-				
 			}
 			
 		} catch (IOException e) {
@@ -37,7 +36,6 @@ public class Server {
 		
 	}
 	
-
 
 }
 

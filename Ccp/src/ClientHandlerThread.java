@@ -10,31 +10,31 @@ public class ClientHandlerThread extends Thread {
 	
 	private Socket connection;
 	
+	
 	public ClientHandlerThread(Socket connection) {
 		this.connection = connection;
 	}
 
 
-
 	@Override
 	public void run() {
+		
 		try {
-			// 3. Read data from client
-			InputStream inputStream;
-			inputStream = connection.getInputStream();
-			Scanner scanner = new Scanner(inputStream);
-			while(true){
-				String request = scanner.nextLine();
-				
-				// 4. Process data
-				if(!processRequest(connection, request)) {
-					break;
-				}
+		InputStream inputStream = connection.getInputStream();
+		Scanner scanner = new Scanner(inputStream);
+		while(true){
+			String request = scanner.nextLine();
+			
+			// 4. Process data
+			if(!processRequest(connection, request)) {
+				break;
 			}
-			scanner.close();
-		} catch (IOException e) {
+		}
+		scanner.close();
+		}catch (Exception e) {
 			e.printStackTrace();
 		}
+		
 	}
 	
 	private boolean processRequest(Socket connection, String request) throws IOException {
