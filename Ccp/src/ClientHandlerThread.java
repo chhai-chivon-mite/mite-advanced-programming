@@ -26,6 +26,7 @@ public class ClientHandlerThread extends Thread {
 			String request = scanner.nextLine();
 			
 			// 4. Process data
+			sleep(3000);
 			if(!processRequest(connection, request)) {
 				break;
 			}

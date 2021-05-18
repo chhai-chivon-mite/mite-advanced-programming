@@ -1,37 +1,38 @@
 import java.awt.EventQueue;
 
 import javax.swing.JFrame;
-import javax.swing.DefaultListModel;
 import javax.swing.JButton;
-import java.awt.BorderLayout;
-import javax.swing.JList;
 import javax.swing.JLabel;
 import javax.swing.SwingConstants;
-import javax.swing.JComboBox;
-import javax.swing.JTextField;
 import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.Socket;
+import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 import java.awt.event.ActionEvent;
+import javax.swing.JComboBox;
+import javax.swing.JTextField;
+import java.awt.Color;
+import javax.swing.DefaultComboBoxModel;
 
 public class ClientGui {
 
 	private JFrame frmCcpClient;
-	private JTextField textField;
 	private JLabel lblStatus;
 	private JButton btnConnect;
 
 	private Socket connection;
-	private PrintWriter writer;
-	private Scanner reader;
 	private boolean isConnected;
-	private JList<String> lstCurrencies;
-	private JComboBox cbxDestinationCurrency;
-	private JComboBox cbxSourceCurrency;
+	private JLabel lblSourceCurrency;
+	private JLabel lblAmount;
+	private JLabel lblTo;
+	private JTextField etxtAmount;
+	private JComboBox<String> cbxSourceCurrency;
+	private JComboBox<String> cbxDestinationCurrency;
+	private JLabel lblResult;
 
 	/**
 	 * Launch the application.
@@ -62,7 +63,7 @@ public class ClientGui {
 	private void initialize() {
 		frmCcpClient = new JFrame();
 		frmCcpClient.setTitle("CCP Client 1.0");
-		frmCcpClient.setBounds(100, 100, 656, 420);
+		frmCcpClient.setBounds(100, 100, 583, 398);
 		frmCcpClient.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frmCcpClient.getContentPane().setLayout(null);
 
@@ -70,170 +71,135 @@ public class ClientGui {
 		btnConnect.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 
-				connectToServer();
+				Thread thread = new ServerHandlerThread("connect");
+				thread.start();
 
 			}
 		});
-		btnConnect.setBounds(332, 37, 117, 29);
+		btnConnect.setBounds(393, 25, 117, 29);
 		frmCcpClient.getContentPane().add(btnConnect);
 
-		lstCurrencies = new JList();
-		lstCurrencies.setBounds(39, 181, 133, 158);
-		frmCcpClient.getContentPane().add(lstCurrencies);
-
-		JLabel lblSupportedCurrencies = new JLabel("Supported Currencies");
-		lblSupportedCurrencies.setHorizontalAlignment(SwingConstants.CENTER);
-		lblSupportedCurrencies.setBounds(26, 155, 165, 16);
-		frmCcpClient.getContentPane().add(lblSupportedCurrencies);
-
-		cbxSourceCurrency = new JComboBox();
-		cbxSourceCurrency.setBounds(332, 177, 83, 27);
-		frmCcpClient.getContentPane().add(cbxSourceCurrency);
-
-		JLabel lblConvertFrom = new JLabel("Convert From:");
-		lblConvertFrom.setHorizontalAlignment(SwingConstants.RIGHT);
-		lblConvertFrom.setBounds(220, 181, 100, 16);
-		frmCcpClient.getContentPane().add(lblConvertFrom);
-
-		JLabel lblTo = new JLabel("To:");
-		lblTo.setHorizontalAlignment(SwingConstants.RIGHT);
-		lblTo.setBounds(220, 265, 100, 16);
-		frmCcpClient.getContentPane().add(lblTo);
-
-		cbxDestinationCurrency = new JComboBox();
-		cbxDestinationCurrency.setBounds(332, 261, 83, 27);
-		frmCcpClient.getContentPane().add(cbxDestinationCurrency);
-
-		JLabel lblAmount = new JLabel("Amount:");
-		lblAmount.setHorizontalAlignment(SwingConstants.RIGHT);
-		lblAmount.setBounds(220, 223, 100, 16);
-		frmCcpClient.getContentPane().add(lblAmount);
-
-		textField = new JTextField();
-		textField.setBounds(332, 216, 76, 26);
-		frmCcpClient.getContentPane().add(textField);
-		textField.setColumns(10);
-
-		JButton btnConvert = new JButton("Convert");
-		btnConvert.setBounds(265, 310, 117, 29);
-		frmCcpClient.getContentPane().add(btnConvert);
-
-		JLabel lblResult = new JLabel("Result");
-		lblResult.setHorizontalAlignment(SwingConstants.CENTER);
-		lblResult.setBounds(484, 181, 100, 16);
-		frmCcpClient.getContentPane().add(lblResult);
-
-		JLabel label = new JLabel("0");
-		label.setHorizontalAlignment(SwingConstants.CENTER);
-		label.setBounds(484, 216, 100, 16);
+		JLabel label = new JLabel("Status:");
+		label.setHorizontalAlignment(SwingConstants.RIGHT);
+		label.setBounds(25, 30, 62, 16);
 		frmCcpClient.getContentPane().add(label);
 
-		JLabel lblConnectionStatus = new JLabel("Connection Status:");
-		lblConnectionStatus.setHorizontalAlignment(SwingConstants.CENTER);
-		lblConnectionStatus.setBounds(39, 42, 141, 16);
-		frmCcpClient.getContentPane().add(lblConnectionStatus);
-
 		lblStatus = new JLabel("(disconnected)");
-		lblStatus.setHorizontalAlignment(SwingConstants.LEFT);
-		lblStatus.setBounds(177, 42, 141, 16);
+		lblStatus.setBounds(96, 30, 122, 16);
 		frmCcpClient.getContentPane().add(lblStatus);
-	}
 
-	private void connectToServer() {
+		lblSourceCurrency = new JLabel("Convert From");
+		lblSourceCurrency.setHorizontalAlignment(SwingConstants.CENTER);
+		lblSourceCurrency.setBounds(39, 126, 141, 16);
+		frmCcpClient.getContentPane().add(lblSourceCurrency);
 
-		Thread thread = new ConnectionHandlerTrhead();
-		thread.start();
+		lblAmount = new JLabel("Amount");
+		lblAmount.setHorizontalAlignment(SwingConstants.CENTER);
+		lblAmount.setBounds(192, 126, 141, 16);
+		frmCcpClient.getContentPane().add(lblAmount);
 
-	}
+		lblTo = new JLabel("To");
+		lblTo.setHorizontalAlignment(SwingConstants.CENTER);
+		lblTo.setBounds(369, 126, 141, 16);
+		frmCcpClient.getContentPane().add(lblTo);
 
-	private void loadSupportedCurrency() {
-		Thread thread = new ServerHandlerThread("list", null);
-		thread.start();
-	}
+		cbxSourceCurrency = new JComboBox();
+		cbxSourceCurrency.setBounds(58, 166, 108, 27);
+		frmCcpClient.getContentPane().add(cbxSourceCurrency);
 
-	private class ConnectionHandlerTrhead extends Thread {
+		etxtAmount = new JTextField();
+		etxtAmount.setHorizontalAlignment(SwingConstants.CENTER);
+		etxtAmount.setBounds(202, 165, 130, 26);
+		frmCcpClient.getContentPane().add(etxtAmount);
+		etxtAmount.setColumns(10);
 
-		@Override
-		public void run() {
-			try {
-				if (isConnected) {
-					System.out.println("Disconnect...");
-					connection.close();
-					lblStatus.setText("(disconnected)");
-					btnConnect.setText("Connect");
-					isConnected = false;
-				} else {
-					System.out.println("Connect...");
-					connection = new Socket("13.229.49.95", 9999);
-					lblStatus.setText("(connected)");
-					btnConnect.setText("Disconnect");
-					isConnected = true;
-					writer = new PrintWriter(connection.getOutputStream());
-					reader = new Scanner(connection.getInputStream());
-					loadSupportedCurrency();
-				}
-			} catch (IOException e) {
-				lblStatus.setText("(error)");
-				System.out.println("Connection error: " + e.getMessage());
+		cbxDestinationCurrency = new JComboBox();
+		cbxDestinationCurrency.setBounds(383, 166, 108, 27);
+		frmCcpClient.getContentPane().add(cbxDestinationCurrency);
+
+		JButton btnConvert = new JButton("Convert");
+		btnConvert.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+
+				Thread thread = new ServerHandlerThread("convert");
+				thread.start();
+
 			}
-		}
+		});
+		btnConvert.setBounds(212, 214, 117, 29);
+		frmCcpClient.getContentPane().add(btnConvert);
 
+		JLabel sdfsdf = new JLabel("Result:");
+		sdfsdf.setHorizontalAlignment(SwingConstants.RIGHT);
+		sdfsdf.setBounds(96, 304, 61, 16);
+		frmCcpClient.getContentPane().add(sdfsdf);
+
+		lblResult = new JLabel("");
+		lblResult.setBackground(Color.DARK_GRAY);
+		lblResult.setBounds(212, 304, 108, 16);
+		frmCcpClient.getContentPane().add(lblResult);
 	}
 
 	private class ServerHandlerThread extends Thread {
 
 		private String operation;
-		private List<String> params;
 
-		public ServerHandlerThread(String operation, List<String> params) {
-			super();
+		public ServerHandlerThread(String operation) {
 			this.operation = operation;
-			this.params = params;
 		}
 
 		@Override
 		public void run() {
 
-			String request = "CCP/1.0#" + operation + "#";
-			if (params != null) {
-				for (String param : params) {
-					request += "<" + param + ">";
+			try {
+				if (operation.equals("connect")) {
+					connectToServer();
+				} else if (operation.equals("convert")) {
+					convertCurrency();
 				}
+			} catch (Exception e) {
+				e.printStackTrace();
 			}
 
-			// Send request to the server
-			writer.write(request + "\r\n");
+		}
+
+		private void connectToServer() {
+			try {
+				if (isConnected) {
+					PrintWriter writer = new PrintWriter(connection.getOutputStream());
+					sendRequestToServer(writer, "CCP/1.0#exit#");
+					connection.close();
+					lblStatus.setText("(disconnected)");
+					btnConnect.setText("Connect");
+					isConnected = false;
+				} else {
+					connection = new Socket("13.229.49.95", 9999);
+					lblStatus.setText("(connected)");
+					btnConnect.setText("Disconnect");
+					isConnected = true;
+					loadSupportedCurrencies();
+				}
+			} catch (IOException e) {
+				lblStatus.setText("(error)");
+				System.out.println("Connect error: " + e.getMessage());
+			}
+		}
+
+		private void sendRequestToServer(PrintWriter writer, String request) {
+			writer.write(request);
+			writer.write("\r\n");
 			writer.flush();
-			System.out.println("[request] " + request);
-
-			// Read response from the server
-			String response = reader.nextLine();
-			processResponse(response);
-
 		}
 
-		private void processResponse(String response) {
-			System.out.println("[processResponse] " + response);
-			String status = getResponseStatus(response);
+		private void loadSupportedCurrencies() throws IOException {
+			PrintWriter writer = new PrintWriter(connection.getOutputStream());
+			String request = "CCP/1.0#list#";
+			sendRequestToServer(writer, request);
+			Scanner scanner = new Scanner(connection.getInputStream());
+			String response = scanner.nextLine();
 			String body = getResponseBody(response);
-			System.out.println("[status] " + status);
-
-			if (status == null) {
-				System.out.println("Invalid response");
-			} else if (operation.equals("list")) {
-				List<String> supportedCurrencies = getSupportedCurrencies(body);
-				showSupportedCurrencies(supportedCurrencies);
-				showCurrenciesInCombobox(supportedCurrencies);
-			}
-		}
-
-		private String getResponseStatus(String response) {
-			String[] parts = response.split("#");
-			if (parts.length != 3) {
-				return null;
-			} else {
-				return parts[1];
-			}
+			List<String> currencies = getCurrencyListFromBody(body);
+			showSupportedCurrencies(currencies);
 		}
 
 		private String getResponseBody(String response) {
@@ -245,30 +211,51 @@ public class ClientGui {
 			}
 		}
 
-		private List<String> getSupportedCurrencies(String body) {
+		private List<String> getCurrencyListFromBody(String body) {
+			List<String> currencies = new ArrayList<String>();
 			String[] parts = body.split("><");
-			List<String> result = new ArrayList<>();
 			for (String part : parts) {
-				String data = part.replace("<", "").replace(">", "");
-				result.add(data);
+				String currency = part.replace("<", "").replace(">", "");
+				currencies.add(currency);
 			}
-			return result;
+			return currencies;
 		}
 
 		private void showSupportedCurrencies(List<String> currencies) {
-			System.out.println("[showSupportedCurrencies] " + currencies.toString());
-			DefaultListModel<String> listModel = new DefaultListModel<>();
-			for (String currency : currencies) {
-				listModel.addElement(currency);
-			}
-			lstCurrencies.setModel(listModel);
-		}
-
-		private void showCurrenciesInCombobox(List<String> currencies) {
 			for (String currency : currencies) {
 				cbxSourceCurrency.addItem(currency);
 				cbxDestinationCurrency.addItem(currency);
 			}
+		}
+
+		private void convertCurrency() {
+
+			lblResult.setText("Processing...");
+
+			String sourceCurrency = cbxSourceCurrency.getSelectedItem().toString();
+			String destinationCurrency = cbxDestinationCurrency.getSelectedItem().toString();
+			String amount = etxtAmount.getText();
+			String request = String.format("CCP/1.0#convert#<%s><%s><%s>", sourceCurrency, amount, destinationCurrency);
+			// String request = "CCP/1.0#convert#<" + sourceCurrency + "><" + amount + "><"
+			// + destinationCurrency + ">";
+			try {
+				PrintWriter writer;
+				writer = new PrintWriter(connection.getOutputStream());
+				sendRequestToServer(writer, request);
+				Scanner scanner = new Scanner(connection.getInputStream());
+				String response = scanner.nextLine();
+				String body = getResponseBody(response);
+				String result = body.replace("<", "").replace(">", "");
+				showConvertResult(Double.parseDouble(result), destinationCurrency);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+
+		private void showConvertResult(double amount, String currency) {
+			NumberFormat numberFormat = NumberFormat.getInstance();
+			String result = numberFormat.format(amount);
+			lblResult.setText(result + " " + currency);
 		}
 
 	}
