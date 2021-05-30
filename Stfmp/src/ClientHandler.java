@@ -42,7 +42,7 @@ public class ClientHandler extends Thread {
 				}
 			}
 		} catch (IOException e) {
-			e.printStackTrace();
+			System.out.println("[Error] " + e.getMessage());
 		}
 		
 		
@@ -62,10 +62,14 @@ public class ClientHandler extends Thread {
 
 	private boolean processRequest(String rawRequest) throws IOException {
 		System.out.println("[Raw Request] " + rawRequest);
+		if(key == 0) {
+			sendResponse("STFMP/1.0##invalid##You need to encrypt the request.");
+			return true;
+		}
 		String request = decrypt(rawRequest);
 		System.out.println("[Decrypt Request] " + request);
 		if(!request.startsWith("STFMP/1.0##")) {
-			sendResponse("SFTMP/1.0##invalid##Invalid request.");
+			sendResponse("STFMP/1.0##invalid##Invalid request.");
 			return true;
 		}
 		if(request.startsWith("STFMP/1.0##write##")) {
@@ -74,27 +78,27 @@ public class ClientHandler extends Thread {
 			String fileName = parts[0];
 			String content = parts[1];
 			writeFile(fileName, content);
-			sendResponse("SFTMP/1.0##ok##The file has been written.");
+			sendResponse("STFMP/1.0##ok##The file has been written.");
 		} else if(request.equals("STFMP/1.0##list##")) {
 			File folder = new File("./files/");
 			String[] fileNames = folder.list();
 			String data = String.join("#", fileNames);
-			sendResponse("SFTMP/1.0##ok##" + data);
+			sendResponse("STFMP/1.0##ok##" + data);
 		} else if(request.startsWith("STFMP/1.0##view##")) {
 			String fileName = request.replace("STFMP/1.0##view##", "");
 			File file = new File("./files/" + fileName);
 			if(!file.exists()) {
-				sendResponse("SFTMP/1.0##not_found##File not found.");
+				sendResponse("STFMP/1.0##not_found##File not found.");
 				return true;
 			}
 			BufferedReader bufferReader = new BufferedReader(new FileReader(file));
 			String content = bufferReader.readLine();
-			sendResponse("SFTMP/1.0##ok##" + content);
+			sendResponse("STFMP/1.0##ok##" + content);
 			bufferReader.close();
 		} else if(request.equals("STFMP/1.0##close##")) {
 			return false;
 		} else {
-			sendResponse("SFTMP/1.0##invalid##Invalid request.");
+			sendResponse("STFMP/1.0##invalid##Invalid request.");
 		}
 		
 		return true;
