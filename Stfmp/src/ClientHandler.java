@@ -28,10 +28,11 @@ public class ClientHandler extends Thread {
 			scanner = new Scanner(connection.getInputStream());
 			while(true) {
 				String request = readRequest();
-				if(request.equals("key")) {
+				if(request.equals("STFMP/1.0##key##")) {
 					Random random = new Random();
 					key = random.nextInt(8) + 1;
-					writer.write(key + "\n");
+					String response = "SFTMP/1.0##ok##" + key + "\n";
+					writer.write(response);
 					writer.flush();
 					System.out.println("[Key] " + key);
 				} else {
@@ -95,6 +96,16 @@ public class ClientHandler extends Thread {
 			String content = bufferReader.readLine();
 			sendResponse("STFMP/1.0##ok##" + content);
 			bufferReader.close();
+		} else if(request.startsWith("STFMP/1.0##delete##")) {
+			String fileName = request.replace("STFMP/1.0##delete##", "");
+			File file = new File(fileName);
+			if(!file.exists()) {
+				sendResponse("STFMP/1.0##not_found##File not found.");
+				return true;
+			}
+			file.delete();
+			sendResponse("STFMP/1.0##ok##The file has been deleted.");
+			return true;
 		} else if(request.equals("STFMP/1.0##close##")) {
 			return false;
 		} else {
