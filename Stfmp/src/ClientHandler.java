@@ -98,7 +98,7 @@ public class ClientHandler extends Thread {
 			bufferReader.close();
 		} else if(request.startsWith("STFMP/1.0##delete##")) {
 			String fileName = request.replace("STFMP/1.0##delete##", "");
-			File file = new File(fileName);
+			File file = new File("./files/" + fileName);
 			if(!file.exists()) {
 				sendResponse("STFMP/1.0##not_found##File not found.");
 				return true;
