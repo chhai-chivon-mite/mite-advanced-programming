@@ -15,7 +15,7 @@ public class Server {
 		
 		try {
 			// 1. Create a server socket and bind to port 9999
-			ServerSocket serverSocket = new ServerSocket(9999);
+			ServerSocket serverSocket = new ServerSocket(8888);
 			
 			while(true) {
 				// 2. Wait for connection from clients

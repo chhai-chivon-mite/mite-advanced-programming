@@ -8,6 +8,8 @@ import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.Socket;
+import java.security.cert.CertificateException;
+import java.security.cert.X509Certificate;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.List;
@@ -16,15 +18,21 @@ import java.awt.event.ActionEvent;
 import javax.swing.JComboBox;
 import javax.swing.JTextField;
 import java.awt.Color;
+
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLSocket;
+import javax.net.ssl.SSLSocketFactory;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
 import javax.swing.DefaultComboBoxModel;
 
-public class ClientGui {
+public class SecureClientGui {
 
 	private JFrame frmCcpClient;
 	private JLabel lblStatus;
 	private JButton btnConnect;
 
-	private Socket connection;
+	private SSLSocket connection;
 	private boolean isConnected;
 	private JLabel lblSourceCurrency;
 	private JLabel lblAmount;
@@ -41,7 +49,7 @@ public class ClientGui {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
-					ClientGui window = new ClientGui();
+					SecureClientGui window = new SecureClientGui();
 					window.frmCcpClient.setVisible(true);
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -53,7 +61,7 @@ public class ClientGui {
 	/**
 	 * Create the application.
 	 */
-	public ClientGui() {
+	public SecureClientGui() {
 		initialize();
 	}
 
@@ -173,13 +181,48 @@ public class ClientGui {
 					btnConnect.setText("Connect");
 					isConnected = false;
 				} else {
-					connection = new Socket("localhost", 8888);
+					// ****** Method 1: verify server certificate with Trust Store
+					/*// Set trust store info
+					System.setProperty("javax.net.ssl.trustStore", "./lib/mite.cacerts");
+					System.setProperty("javax.net.ssl.trustStorePassword", "111111");
+					
+					// Connect to server
+					SSLSocketFactory factory = (SSLSocketFactory) SSLSocketFactory.getDefault();
+					connection = (SSLSocket) factory.createSocket("localhost", 9999);*/
+					
+					// ****** Method 2: verify server certificate by accepting any certificate
+					X509TrustManager trustManager = new X509TrustManager() {
+						
+						@Override
+						public X509Certificate[] getAcceptedIssuers() {
+							// TODO Auto-generated method stub
+							return null;
+						}
+						
+						@Override
+						public void checkServerTrusted(X509Certificate[] chain, String authType) throws CertificateException {
+							// TODO Auto-generated method stub
+							
+						}
+						
+						@Override
+						public void checkClientTrusted(X509Certificate[] chain, String authType) throws CertificateException {
+							// TODO Auto-generated method stub
+							
+						}
+					};
+					TrustManager[] allTrustManagers = new TrustManager[] {trustManager};
+					SSLContext context = SSLContext.getInstance("SSL");
+					context.init(null, allTrustManagers, null);
+					SSLSocketFactory factory = context.getSocketFactory();
+					connection = (SSLSocket) factory.createSocket("localhost", 9999);
+					
 					lblStatus.setText("(connected)");
 					btnConnect.setText("Disconnect");
 					isConnected = true;
 					loadSupportedCurrencies();
 				}
-			} catch (IOException e) {
+			} catch (Exception e) {
 				lblStatus.setText("(error)");
 				System.out.println("Connect error: " + e.getMessage());
 			}
